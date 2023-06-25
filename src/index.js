@@ -20,8 +20,6 @@ const lightbox = new SimpleLightbox('.gallery a', {
     });
 
 hideButtonLoadMore();
-//buttonLoadMoreEl.classList.add('is-hidden');
-
 
 function createMarkupImages(imagesMarkup) {
 
@@ -66,10 +64,7 @@ const handleSearchFormSubmit = event => {
   
   hideButtonLoadMore();
    
-    //buttonLoadMoreEl.classList.add('is-hidden');
-
-
-  if (!inputEl.value.trim()) {
+     if (!inputEl.value.trim()) {
 
     Notiflix.Notify.failure(
 
@@ -89,8 +84,7 @@ const handleSearchFormSubmit = event => {
     if (data.totalHits === 0) {
 
       hideButtonLoadMore();
-        //buttonLoadMoreEl.classList.add('is-hidden');
-
+        
         Notiflix.Notify.info('Sorry, there are no images matching your search query. Please try again.');
 
         galleryWrapperEl.innerHTML = '';
@@ -111,12 +105,12 @@ const handleSearchFormSubmit = event => {
            return;   
        
        }
-      // hideButtonLoadMore();
+     
                  
        galleryWrapperEl.innerHTML = createMarkupImages(data.hits);
 
        showButtonLoadMore();
-       //buttonLoadMoreEl.classList.remove('is-hidden');
+      
                       
        lightbox.refresh();
 
@@ -132,13 +126,10 @@ const handleLoadMoreButtonClick = () => {
 
     hideButtonLoadMore();
 
- //  buttonLoadMoreEl.classList.add('is-hidden');
- 
-   pixabayInstance.fetchImages()
+    pixabayInstance.fetchImages()
    .then(data => {
          
-     console.log(pixabayInstance.page)
-
+     
      const totalPages = Math.ceil(data.totalHits / pixabayInstance.per_page);
 
      if (pixabayInstance.page === totalPages) {
@@ -155,8 +146,7 @@ const handleLoadMoreButtonClick = () => {
      showButtonLoadMore()
            
      lightbox.refresh();
-     
-               
+                    
       })
  
     .catch(console.warn);
@@ -165,11 +155,13 @@ const handleLoadMoreButtonClick = () => {
 }
 
 function showButtonLoadMore() {
+    
   buttonLoadMoreEl.classList.remove('is-hidden');
   
 }
 
 function hideButtonLoadMore() {
+
   buttonLoadMoreEl.classList.add('is-hidden');
 }
 
