@@ -17,24 +17,14 @@ const lightbox = new SimpleLightbox('.gallery a', {
      
     });
 
-
 hideButtonLoadMore();
-
 
 function createMarkupImages(imagesMarkup) {
 
 
-
-
       if (!imagesMarkup) {
 
-
-
-
     Notiflix.Notify.failure(
-
-
-
 
             `❌Oops! Something went wrong! Try reloading the page!`
           );
@@ -61,14 +51,10 @@ function createMarkupImages(imagesMarkup) {
 };
 
 
+const handleSearchFormSubmit = async (event) => {
 
 
-
-
-const handleSearchFormSubmit = event => {
-
-
-    event.preventDefault();
+  event.preventDefault();
  
   galleryWrapperEl.innerHTML = '';
  
@@ -87,66 +73,66 @@ const handleSearchFormSubmit = event => {
  
    pixabayInstance.q = inputEl.value;
 
-
    inputEl.value = '';
 
-
-     pixabayInstance.fetchImages().then( data  => {
+  try {
+    const result = await pixabayInstance.fetchImages(); //then( data  => {
    
-    console.log(data);
-   
-    if (data.totalHits === 0) {
+    console.log(result);
 
-
-      hideButtonLoadMore();
-       
-        Notiflix.Notify.info('Sorry, there are no images matching your search query. Please try again.');
-
-        //galleryWrapperEl.innerHTML = '';
-
-      return;
-     
-       }
-     
-       
-       if (data.totalHits < pixabayInstance.per_page) {
-       
-       
-         Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
-
-         return buttonLoadMoreEl.classList.add('is-hidden');
-                     
-                
-       }
-                     
-       galleryWrapperEl.innerHTML = createMarkupImages(data.hits);
-
+     galleryWrapperEl.innerHTML = createMarkupImages(result.hits);
 
        showButtonLoadMore();
                            
        lightbox.refresh();
+   
+    if (result.totalHits === 0) {
 
+      hideButtonLoadMore();
+       galleryWrapperEl.innerHTML = createMarkupImages(result.hits);
+       
+        Notiflix.Notify.info('Sorry, there are no images matching your search query. Please try again.');
 
-    })
-    .catch(console.warn);
+        galleryWrapperEl.innerHTML = '';
+
+        return;
+     
+       }
+     
+       
+    if (result.totalHits < pixabayInstance.per_page) {
+         
+      galleryWrapperEl.innerHTML = createMarkupImages(result.hits);
+      lightbox.refresh();
+              
+         Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+        
+         return buttonLoadMoreEl.classList.add('is-hidden');
+                              
+       }
+                     
+     }
+     
+  catch (error) {
+    
+    Notiflix.Notify.failure(error.message);
+
+     }
+
 };
 
 
                //       ПАГІНАЦІЯ
 
 
-const handleLoadMoreButtonClick = () => {
+const handleLoadMoreButtonClick = async () => {
    
   pixabayInstance.page += 1;
 
-  
+  hideButtonLoadMore();
 
-    hideButtonLoadMore();
-
-
-    pixabayInstance.fetchImages()
-      .then(data => {
-     
+  const data = await pixabayInstance.fetchImages();
+  try {
          galleryWrapperEl.insertAdjacentHTML('beforeend', createMarkupImages(data.hits));
 
      lightbox.refresh();
@@ -165,29 +151,22 @@ const handleLoadMoreButtonClick = () => {
        hideButtonLoadMore();
        return;
      }
+      }
+                     
+      
+    catch (error) {
+    
+    Notiflix.Notify.failure(error.message);
 
-
-          
-      })
- 
-    .catch(console.warn);
-
-
-
+     }
 
 }
-
 
 function showButtonLoadMore() {
-   
-  buttonLoadMoreEl.classList.remove('is-hidden');
- 
-}
-
+     buttonLoadMoreEl.classList.remove('is-hidden');
+ }
 
 function hideButtonLoadMore() {
-
-
   buttonLoadMoreEl.classList.add('is-hidden');
 }
 
