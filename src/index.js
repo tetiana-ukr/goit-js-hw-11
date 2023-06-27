@@ -1,8 +1,6 @@
 import { pixabayAPI } from './js/fetch-images';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
-
-
 import Notiflix from 'notiflix';
 
 
@@ -16,18 +14,26 @@ const pixabayInstance = new pixabayAPI();
 const inputEl = searchFormEl.firstElementChild;
 const lightbox = new SimpleLightbox('.gallery a', {
       captionDelay: 250,
-      
+     
     });
+
 
 hideButtonLoadMore();
 
+
 function createMarkupImages(imagesMarkup) {
+
+
 
 
       if (!imagesMarkup) {
 
 
+
+
     Notiflix.Notify.failure(
+
+
 
 
             `❌Oops! Something went wrong! Try reloading the page!`
@@ -56,17 +62,23 @@ function createMarkupImages(imagesMarkup) {
 
 
 
+
+
+
 const handleSearchFormSubmit = event => {
+
 
     event.preventDefault();
  
   galleryWrapperEl.innerHTML = '';
-  
+ 
   hideButtonLoadMore();
    
      if (!inputEl.value.trim()) {
 
+
     Notiflix.Notify.failure(
+
 
             '❌  Please enter data to search!')
    
@@ -75,7 +87,9 @@ const handleSearchFormSubmit = event => {
  
    pixabayInstance.q = inputEl.value;
 
+
    inputEl.value = '';
+
 
      pixabayInstance.fetchImages().then( data  => {
    
@@ -83,56 +97,67 @@ const handleSearchFormSubmit = event => {
    
     if (data.totalHits === 0) {
 
+
       hideButtonLoadMore();
-        
+       
         Notiflix.Notify.info('Sorry, there are no images matching your search query. Please try again.');
 
-        galleryWrapperEl.innerHTML = '';
-
+        //galleryWrapperEl.innerHTML = '';
 
       return;
      
        }
-      
+     
        
        if (data.totalHits < pixabayInstance.per_page) {
        
-         buttonLoadMoreEl.classList.add('is-hidden');
-
-         galleryWrapperEl.innerHTML = createMarkupImages(data.hits);
-         Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
-          lightbox.refresh();           
-           return;   
        
+         Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+
+         return buttonLoadMoreEl.classList.add('is-hidden');
+                     
+                
        }
-     
-                 
+                     
        galleryWrapperEl.innerHTML = createMarkupImages(data.hits);
 
+
        showButtonLoadMore();
-      
-                      
+                           
        lightbox.refresh();
+
 
     })
     .catch(console.warn);
 };
 
-               //       ПАГІНАЦІЯ 
+
+               //       ПАГІНАЦІЯ
+
 
 const handleLoadMoreButtonClick = () => {
    
   pixabayInstance.page += 1;
 
+  
+
     hideButtonLoadMore();
 
+
     pixabayInstance.fetchImages()
-   .then(data => {
-         
+      .then(data => {
+     
+         galleryWrapperEl.insertAdjacentHTML('beforeend', createMarkupImages(data.hits));
+
+     lightbox.refresh();
+
+     showButtonLoadMore()
+                          
      
      const totalPages = Math.ceil(data.totalHits / pixabayInstance.per_page);
 
-     if (pixabayInstance.page === totalPages) {
+
+     if (pixabayInstance.page >= totalPages) {
        
        Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
        galleryWrapperEl.insertAdjacentHTML('beforeend', createMarkupImages(data.hits));
@@ -141,26 +166,27 @@ const handleLoadMoreButtonClick = () => {
        return;
      }
 
-     galleryWrapperEl.insertAdjacentHTML('beforeend', createMarkupImages(data.hits));
 
-     showButtonLoadMore()
-           
-     lightbox.refresh();
-                    
+          
       })
  
     .catch(console.warn);
 
 
+
+
 }
+
 
 function showButtonLoadMore() {
-    
+   
   buttonLoadMoreEl.classList.remove('is-hidden');
-  
+ 
 }
 
+
 function hideButtonLoadMore() {
+
 
   buttonLoadMoreEl.classList.add('is-hidden');
 }
@@ -168,6 +194,3 @@ function hideButtonLoadMore() {
 
 searchFormEl.addEventListener('submit', handleSearchFormSubmit);
 buttonLoadMoreEl.addEventListener('click', handleLoadMoreButtonClick);
-
-
-
